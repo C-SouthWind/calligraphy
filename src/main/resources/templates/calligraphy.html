@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" />
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <!-- Form -->
+    <el-button type="text" @click="addStudent()">添加学生</el-button>
+    <el-dialog title="添加学生" :visible.sync="dialogFormVisible">
+        <el-form ref="form" :model="form" label-width="80px">
+            <el-form-item label="学生姓名">
+                <el-input v-model="form.studentsName"></el-input>
+            </el-form-item>
+            <el-form-item label="缴费金额">
+                <el-input v-model="form.studentsMoney"></el-input>
+            </el-form-item>
+            <el-form-item label="上课季度">
+                <el-select v-model="form.courseId" placeholder="请选择季度">
+                    <el-option v-for="name in selectAllName" :key="name.courseId" :value='name.courseId' :label='name.courseName'  v-text="name.courseName"></el-option>
+                   <!-- <el-option label= value={{name.courseId}}></el-option>-->
+                </el-select>
+            </el-form-item>
+            <el-form-item label="上课时间">
+                <el-select v-model="form.teachingId" placeholder="请选择时间">
+                    <el-option v-for="time in selectAllTime" :key="time.teachingId" :value='time.teachingId' :label='time.teachingTime'  v-text="time.teachingTime"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="家长电话">
+                <el-input v-model="form.parentsTel"></el-input>
+            </el-form-item>
+            <el-form-item label="入班时间">
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期"  value-format="yyyy-MM-dd" v-model="form.startDate" style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit()">立即创建</el-button>
+                <el-button>取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+
+    <template>
+        <el-table
+                ref="filterTable"
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="studentsId"
+                    label="编号">
+            </el-table-column>
+            <el-table-column
+                    prop="studentsName"
+                    label="姓名">
+            </el-table-column>
+            <el-table-column
+                    prop="studentsMoney"
+                    label="缴费金额">
+            </el-table-column>
+            <el-table-column
+                    prop="courseName"
+                    label="上课季度"
+                    column-key="date"
+                    :filters="selectAllCourseName"
+                    :filter-method="filterHandler">
+            </el-table-column>
+            <el-table-column
+                    prop="teachingTime"
+                    label="上课时间"
+                    column-key="date"
+                    :filters="selectAllTeachingName"
+                    :filter-method="filterHandler">
+            </el-table-column>
+            <el-table-column
+                    prop="parentsTel"
+                    label="家长电话">
+            </el-table-column>
+            <el-table-column
+                    prop="startDate"
+                    label="入班时间">
+            </el-table-column>
+            <el-table-column
+                    prop="stateName"
+                    label="状态"
+                    column-key="date"
+                    :filters="selectAllStateeName"
+                    :filter-method="filterHandler">
+            </el-table-column>
+
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button
+                          size="mini"
+                          @click="handleEdit(scope.$index, scope.row)">编辑</el-button><br>
+                    <el-button
+                          size="mini"
+                          type="danger"
+                          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+
+
+    <el-dialog title="修改学生" :visible.sync="updateFormVisible">
+        <el-form ref="updateform" :model="updateform" label-width="80px">
+            <el-form-item label="学生姓名">
+                <el-input v-model="updateform.studentsName"></el-input>
+            </el-form-item>
+            <el-form-item label="缴费金额">
+                <el-input v-model="updateform.studentsMoney"></el-input>
+            </el-form-item>
+            <el-form-item label="上课季度">
+                <el-select v-model="updateform.courseId" placeholder="请选择季度">
+                    <el-option v-for="name in selectAllName" :key="name.courseId" :value='name.courseId' :label='name.courseName'  v-text="name.courseName"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="上课时间">
+                <el-select v-model="updateform.teachingId" placeholder="请选择时间">
+                    <el-option v-for="time in selectAllTime" :key="time.teachingId" :value='time.teachingId' :label='time.teachingTime'  v-text="time.teachingTime"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="家长电话">
+                <el-input v-model="updateform.parentsTel"></el-input>
+            </el-form-item>
+            <el-form-item label="入班时间">
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期"  value-format="yyyy-MM-dd" v-model="updateform.startDate" style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="修改时间">
+                <el-col :span="11">
+                    <el-date-picker type="date" placeholder="选择日期"  value-format="yyyy-MM-dd" v-model="updateform.studentsAmendTime" style="width: 100%;"></el-date-picker>
+                </el-col>
+            </el-form-item>
+            <el-form-item label="个人状态">
+                <el-select v-model="updateform.studentsState" placeholder="请选择状态">
+                    <el-option v-for="statee in stateeselectAll" :key="statee.stateId" :value='statee.stateId' :label='statee.stateName'  v-text="statee.stateName"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="updateSubmit()">立即修改</el-button>
+                <el-button>取消</el-button>
+            </el-form-item>
+        </el-form>
+    </el-dialog>
+
+</div>
+
+</body>
+<script>
+
+    var app = new Vue({
+        el:'#app',
+        data:{
+            dialogFormVisible: false,
+            updateFormVisible: false,
+            form:{},
+            tableData: [],
+            selectAllCourseName:[],
+            selectAllTeachingName:[],
+            selectAllStateeName:[],
+            selectAllName:[],
+            selectAllTime:[],
+            updateform:{},
+            stateeselectAll:[]
+        },
+        methods: {
+            formatter(row, column) {
+               console.log(row)
+             },
+             filterTag(value, row) {
+               return row.tag === value;
+             },
+             filterHandler(value, row, column) {
+               const property = column['property'];
+               return row[property] === value;
+             },
+            handleEdit(index, row) {
+                app.updateFormVisible = true;
+                $.post("stu/selectByPrimaryKey",{studentsId:row.studentsId},function (data) {
+                        app.updateform = data.data;
+                })
+                $.post("/course/selectAllName",function (data) {
+                    app.selectAllName = data.data;
+                })
+                $.post("/teaching/selectAllTime",function (data) {
+                    app.selectAllTime = data.data;
+                })
+                $.post("statee/selectAll",function (data) {
+                    app.stateeselectAll = data.data;
+                })
+            },
+            updateSubmit(){
+                $.post("stu/updateByPrimaryKey",app.updateform,function (data) {
+                    if("20008"==data.code) {
+                        app.$message({
+                            message: data.msg,
+                            type: 'success'
+                        });
+                    }else{
+                        app.$message.error(data.msg);
+                    }
+                  })
+                app.updateFormVisible=false;
+                window.location.reload();
+                /*$.post("stu/studentsVoAll",function (data) {
+                    app.tableData = data.data;
+                })*/
+            },
+            handleDelete(index, row) {
+                $.post("stu/deleteById",{studentsId:row.studentsId},function (data) {
+                   if("20007"==data.code) {
+                        app.$message({
+                            message: data.msg,
+                            type: 'success'
+                        });
+                    }else{
+                        app.$message.error(data.msg);
+                    }
+
+                });
+               $.post("stu/studentsVoAll",function (data) {
+                    app.tableData = data.data;
+                })
+            },
+            addStudent(){
+                app.dialogFormVisible = true;
+                $.post("/course/selectAllName",function (data) {
+                    app.selectAllName = data.data;
+                })
+                $.post("/teaching/selectAllTime",function (data) {
+                    app.selectAllTime = data.data;
+                })
+            },
+            onSubmit() {
+                $.post("/stu/insert",app.form,function (data) {
+                    if("20006"==data.code) {
+                        app.$message({
+                            message: data.msg,
+                            type: 'success'
+                        });
+                    }else{
+                        app.$message.error(data.msg);
+                    }
+                });
+                app.dialogFormVisible = false;
+
+                window.location.reload();
+                /*$.post("stu/studentsVoAll",function (data) {
+                    app.tableData = data.data;
+                })*/
+            }
+        }
+    })
+
+
+    $.post("stu/studentsVoAll",function (data) {
+        app.tableData = data.data;
+    })
+    $.post("course/selectAllCourseName",function (data) {
+        app.selectAllCourseName = data.data;
+    })
+    $.post("teaching/selectAllTeachingName",function (data) {
+        app.selectAllTeachingName = data.data;
+    })
+    $.post("statee/selectAllStateeName",function (data) {
+        app.selectAllStateeName = data.data;
+    })
+</script>
+</html>

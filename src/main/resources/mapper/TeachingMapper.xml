@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chj.mapper.TeachingMapper" >
+  <resultMap id="BaseResultMap" type="com.chj.model.Teaching" >
+    <id column="teaching_id" property="teachingId" jdbcType="INTEGER" />
+    <result column="teaching_time" property="teachingTime" jdbcType="VARCHAR" />
+    <result column="teaching_time_redundant" property="teachingTimeRedundant" jdbcType="VARCHAR" />
+    <result column="teaching_time_creation_time" property="teachingTimeCreationTime" jdbcType="VARCHAR" />
+    <result column="teaching_time_amend_time" property="teachingTimeAmendTime" jdbcType="VARCHAR" />
+    <result column="teaching_time_state" property="teachingTimeState" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from teaching
+    where teaching_id = #{teachingId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.chj.model.Teaching" >
+    <selectKey resultType="java.lang.Integer" keyProperty="teachingId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into teaching (teaching_time, teaching_time_redundant, 
+      teaching_time_creation_time, teaching_time_amend_time, 
+      teaching_time_state)
+    values (#{teachingTime,jdbcType=VARCHAR}, #{teachingTimeRedundant,jdbcType=VARCHAR}, 
+      #{teachingTimeCreationTime,jdbcType=VARCHAR}, #{teachingTimeAmendTime,jdbcType=DATE},
+      #{teachingTimeState,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.chj.model.Teaching" >
+    update teaching
+    set teaching_time = #{teachingTime,jdbcType=VARCHAR},
+      teaching_time_redundant = #{teachingTimeRedundant,jdbcType=VARCHAR},
+      teaching_time_creation_time = #{teachingTimeCreationTime,jdbcType=VARCHAR},
+      teaching_time_amend_time = #{teachingTimeAmendTime,jdbcType=VARCHAR},
+      teaching_time_state = #{teachingTimeState,jdbcType=VARCHAR}
+    where teaching_id = #{teachingId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select teaching_id, teaching_time, teaching_time_redundant, teaching_time_creation_time, 
+    teaching_time_amend_time, teaching_time_state
+    from teaching
+    where teaching_id = #{teachingId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select teaching_id, teaching_time, teaching_time_redundant, teaching_time_creation_time, 
+    teaching_time_amend_time, teaching_time_state
+    from teaching
+  </select>
+</mapper>

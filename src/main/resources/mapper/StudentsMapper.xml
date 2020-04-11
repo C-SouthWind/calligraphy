@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chj.mapper.StudentsMapper" >
+  <resultMap id="BaseResultMap" type="com.chj.model.Students" >
+    <id column="students_id" property="studentsId" jdbcType="INTEGER" />
+    <result column="students_name" property="studentsName" jdbcType="VARCHAR" />
+    <result column="students_money" property="studentsMoney" jdbcType="INTEGER" />
+    <result column="course_id" property="courseId" jdbcType="INTEGER" />
+    <result column="teaching_id" property="teachingId" jdbcType="INTEGER" />
+    <result column="parents_tel" property="parentsTel" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="VARCHAR" />
+    <result column="students_redundant" property="studentsRedundant" jdbcType="VARCHAR" />
+    <result column="students_amend_time" property="studentsAmendTime" jdbcType="VARCHAR" />
+    <result column="students_state" property="studentsState" jdbcType="VARCHAR" />
+  </resultMap>
+
+
+
+  <resultMap id="BaseResultMap1" type="com.chj.model.StudentsVo">
+    <id column="students_id" jdbcType="INTEGER" property="studentsId" />
+    <result column="students_name" jdbcType="VARCHAR" property="studentsName" />
+    <result column="students_money" jdbcType="INTEGER" property="studentsMoney" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="teaching_name" jdbcType="VARCHAR" property="teachingName" />
+    <result column="parents_tel" jdbcType="VARCHAR" property="parentsTel" />
+    <result column="start_date" jdbcType="VARCHAR" property="startDate" />
+    <result column="state_name" jdbcType="VARCHAR" property="stateName" />
+  </resultMap>
+
+  <select id="studentsVoAll" resultMap="BaseResultMap1">
+    SELECT s.students_id,s.students_name,s.students_money,c.course_name,t.teaching_time,s.parents_tel,s.start_date,st.state_name from students  s
+        join course c on s.course_id = c.course_id
+        join teaching  t on s.teaching_id = t.teaching_id
+        join statee st on st.state_id = s.students_state
+  </select>
+
+
+
+
+
+
+
+  <update id="updateByPrimaryKey" parameterType="com.chj.model.Students" >
+    update students
+    set students_name = #{studentsName,jdbcType=VARCHAR},
+      students_money = #{studentsMoney,jdbcType=INTEGER},
+      course_id = #{courseId,jdbcType=INTEGER},
+      teaching_id = #{teachingId,jdbcType=INTEGER},
+      parents_tel = #{parentsTel,jdbcType=VARCHAR},
+      start_date = #{startDate,jdbcType=VARCHAR},
+      students_redundant = #{studentsRedundant,jdbcType=VARCHAR},
+      students_amend_time = #{studentsAmendTime,jdbcType=VARCHAR},
+      students_state = #{studentsState,jdbcType=VARCHAR}
+    where students_id = #{studentsId,jdbcType=INTEGER}
+  </update>
+<update id="deleteById" parameterType="java.lang.Integer">
+    update students
+    set students_state = 2
+    where students_id = #{studentsId,jdbcType=INTEGER}
+</update>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from students
+    where students_id = #{studentsId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.chj.model.Students" >
+    <selectKey resultType="java.lang.Integer" keyProperty="studentsId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into students (students_name, students_money, course_id, 
+      teaching_id, parents_tel, start_date, 
+      students_redundant, students_amend_time, students_state
+      )
+    values (#{studentsName,jdbcType=VARCHAR}, #{studentsMoney,jdbcType=INTEGER}, #{courseId,jdbcType=INTEGER}, 
+      #{teachingId,jdbcType=INTEGER}, #{parentsTel,jdbcType=VARCHAR}, #{startDate,jdbcType=VARCHAR},
+      #{startDate,jdbcType=VARCHAR}, #{startDate,jdbcType=VARCHAR}, 1
+      )
+  </insert>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select students_id, students_name, students_money, course_id, teaching_id, parents_tel, 
+    start_date, students_redundant, students_amend_time, students_state
+    from students
+    where students_id = #{studentsId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select students_id, students_name, students_money, course_id, teaching_id, parents_tel, 
+    start_date, students_redundant, students_amend_time, students_state
+    from students
+  </select>
+</mapper>

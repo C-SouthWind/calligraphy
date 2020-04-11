@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chj.mapper.CourseMapper" >
+  <resultMap id="BaseResultMap" type="com.chj.model.Course" >
+    <id column="course_id" property="courseId" jdbcType="INTEGER" />
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="course_redundant" property="courseRedundant" jdbcType="VARCHAR" />
+    <result column="course_creation_time" property="courseCreationTime" jdbcType="VARCHAR" />
+    <result column="course_amend_time" property="courseAmendTime" jdbcType="VARCHAR" />
+    <result column="course_state" property="courseState" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from course
+    where course_id = #{courseId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.chj.model.Course" >
+    <selectKey resultType="java.lang.Integer" keyProperty="courseId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into course (course_name, course_redundant, course_creation_time, 
+      course_amend_time, course_state)
+    values (#{courseName,jdbcType=VARCHAR}, #{courseRedundant,jdbcType=VARCHAR}, #{courseCreationTime,jdbcType=VARCHAR},
+      #{courseAmendTime,jdbcType=VARCHAR}, #{courseState,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.chj.model.Course" >
+    update course
+    set course_name = #{courseName,jdbcType=VARCHAR},
+      course_redundant = #{courseRedundant,jdbcType=VARCHAR},
+      course_creation_time = #{courseCreationTime,jdbcType=VARCHAR},
+      course_amend_time = #{courseAmendTime,jdbcType=VARCHAR},
+      course_state = #{courseState,jdbcType=VARCHAR}
+    where course_id = #{courseId,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select course_id, course_name, course_redundant, course_creation_time, course_amend_time, 
+    course_state
+    from course
+    where course_id = #{courseId,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select course_id, course_name, course_redundant, course_creation_time, course_amend_time, 
+    course_state
+    from course
+  </select>
+</mapper>
